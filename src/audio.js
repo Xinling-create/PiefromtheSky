@@ -1,27 +1,8 @@
-export async function initAudio(onLoud) {
-  const ctx = new AudioContext();
-  const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const src = ctx.createMediaStreamSource(micStream);
-  const analyser = ctx.createAnalyser();
 
 //   // background music setup （different stream from the microphone） --to be edited
 //   const bgm = new Audio('./music.mp3');
 //   const bgmSource = audioCtx.createMediaElementSource(bgm);
 //   bgm.play();
-  
-  src.connect(analyser);
-  analyser.fftSize = 512;
-  const data = new Uint8Array(analyser.frequencyBinCount);
-
-  function loop() {
-    analyser.getByteFrequencyData(data);
-    const avg = data.reduce((a, b) => a + b) / data.length;
-    if (avg > 40) onLoud(avg);
-    requestAnimationFrame(loop);
-  }
-  loop();
-}
-
 
 export async function initAudio(onLoud) {
   const ctx = new AudioContext();
