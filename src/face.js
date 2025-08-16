@@ -4,7 +4,7 @@ let faceLandmarker;
 
 export async function initFaceLandmarker() {
   const fileset = await FilesetResolver.forVisionTasks(
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm"
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
   );
   faceLandmarker = await FaceLandmarker.createFromOptions(fileset, {
     baseOptions: {
@@ -21,7 +21,7 @@ export function detectFace(video) {
   if (results.faceLandmarks.length > 0) {
     const lm = results.faceLandmarks[0];
     const mouthOpen = lm[14].y - lm[13].y; // upper lip - lower lip
-    const noseX = lm[1].x; // nose tip x-coordinate
+    const noseX = lm[1].x; // nose
     return { mouthOpen, noseX };
   }
   return null;
