@@ -28,6 +28,9 @@ export let faceData = {
   mouthValue: 0,
   noseX: 0
 };
+
+export let fireCooldown = false;
+
 // 人脸检测异步循环
 async function faceLoop() {
   try {
