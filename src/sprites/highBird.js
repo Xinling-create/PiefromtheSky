@@ -3,8 +3,6 @@ import Phaser from "phaser";
 export default class HighBird extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "highbird");
-    this.setScale(0.1); // 
-
     scene.add.existing(this);
     scene.physics.add.existing(this, false); // false 保证动态体
 
@@ -20,8 +18,6 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
         }
       }
     });
-
-    this.setScale(0.5);
 
     // 每只鸟有一定几率掉屎
     this.poopTimer = scene.time.addEvent({
@@ -39,7 +35,13 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
     const scene = this.scene;
     if (!scene || !scene.physics) return;
     const poop = scene.physics.add.sprite(this.x, this.y, "poop");
-    poop.setScale(0.3);
+    
+    // 使用 displayWidth / 原始纹理宽度来计算实际 scale
+    const birdScaleX = this.displayWidth / this.width;
+    const birdScaleY = this.displayHeight / this.height;
+    poop.setScale(birdScaleX * 0.5, birdScaleY * 0.5); // poop 相对 bird 的比例
+
+
     poop.isBeingEaten = false;
 
     if (!scene.grossGroup) {

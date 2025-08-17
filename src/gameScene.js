@@ -98,6 +98,11 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         const y = height * 0.55; // 低空飞过
         const bird = new LowBird(this, width, y);
+        this.resize(0.6, 1, 0.55, bird);
+        if (bird.body) {
+          bird.body.setSize(bird.width, bird.height);
+          bird.body.setOffset(0, 0);
+      }
         this.lowBirds.add(bird);
       }
     });
@@ -124,6 +129,11 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         const y = height * 0.2; // 低空飞过
         const bird = new highBird(this, width, y);
+        this.resize(0.5, 1, 0.2, bird);
+        if (bird.body) {
+          bird.body.setSize(bird.width, bird.height);
+          bird.body.setOffset(0, 0);
+      }
         this.highBirds.add(bird);
       },
       loop: true
@@ -141,7 +151,7 @@ export default class GameScene extends Phaser.Scene {
     let canvasHeight = this.sys.canvas.height;
 
     let targetHeight = canvasHeight * sizeRate;
-    let scale = targetHeight / this.character.height;
+    let scale = targetHeight / item.height;
     if (scale > 1) scale = 1; // 最大缩放比例为 1
     item.setScale(scale);
     item.x = canvasWidth * xRate;   
@@ -151,9 +161,7 @@ export default class GameScene extends Phaser.Scene {
   resizeCharacter() {
     this.resize(0.6, 0.5, 0.7, this.character);
   }
-    
   
-
   // 喷火时调用：只烤“靠近小猫”的低空鸟
   triggerFire() {
     const cat = this.character;
@@ -180,53 +188,63 @@ export default class GameScene extends Phaser.Scene {
   // -------------------
   // 随机生成食物
   // -------------------
-  spawnRandomFood() {
-  const cfg = this.spawnConfig;
-  const existingItems = [...this.deliciousGroup.getChildren(), ...this.grossGroup.getChildren()];
-  const minSpacing = 50; // 最小水平间隔 px
-  const newItems = []; 
+   spawnRandomFood() {
+      const cfg = this.spawnConfig;
+      const canvasWidth = this.sys.canvas.width;
+      const canvasHeight = this.sys.canvas.height;
 
-  const count = Phaser.Math.Between(1, cfg.maxSpawnPerRound);
+      const existingItems = [...this.deliciousGroup.getChildren(), ...this.grossGroup.getChildren()];
+      const existingXRates = existingItems.map(item => item.x / canvasWidth);
 
-  for (let i = 0; i < count; i++) {
-    let x, y;
-    let tries = 0;
+      const minSpacingRate = 0.05; // 最小水平间隔比例
+      const newItems = [];
+      const count = Phaser.Math.Between(1, cfg.maxSpawnPerRound);
 
-    do {
-      x = Phaser.Math.Between(50, this.sys.canvas.width - 50);
-      y = -50;
-      tries++;
-      // 避免无限循环
-      if (tries > 100) break;
-    } while (existingItems.concat(newItems).some(item => Math.abs(item.x - x) < minSpacing));
+      for (let i = 0; i < count; i++) {
+        let xRate, yRate;
+        let tries = 0;
 
-    newItems.push({ x, y });
+        do {
+          xRate = Phaser.Math.FloatBetween(0.05, 0.95); // x 在 0~1 之间，留边距
+          yRate = Phaser.Math.FloatBetween(-0.05, 0.05); // 初始在画布上方稍微偏出屏幕
+          tries++;
+          if (tries > 100) break;
+        } while (
+          existingXRates.concat(newItems.map(i => i.xRate))
+            .some(rate => Math.abs(rate - xRate) < minSpacingRate)
+        );
 
-    const isGross = Math.random() < cfg.grossRatio;
-    if (isGross) {
-      const texture = Phaser.Utils.Array.GetRandom(["g1"]);
-      this.spawnGrossItem(x, y, texture);
-    } else {
-      const texture = Phaser.Utils.Array.GetRandom(["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10"]);
-      this.spawnDeliciousItem(x, y, texture);
+        newItems.push({ xRate, yRate });
+
+        const isGross = Math.random() < cfg.grossRatio;
+        const texture = isGross
+          ? Phaser.Utils.Array.GetRandom(["g1"])
+          : Phaser.Utils.Array.GetRandom([
+              "d1","d2","d3","d4","d5","d6","d7","d8","d9","d10"
+            ]);
+
+        // 传比例给 resize
+        const item = isGross
+          ? this.spawnGrossItem(xRate, yRate, texture)
+          : this.spawnDeliciousItem(xRate, yRate, texture);
+      }
+
+      // 更新生成间隔和 gross 比例
+      cfg.baseDelay = Math.max(cfg.minDelay, cfg.baseDelay * cfg.delayDecay);
+      cfg.grossRatio = Math.min(cfg.maxGrossRatio, cfg.grossRatio + cfg.grossRatioIncrease);
+
+      // 下一轮生成
+      this.time.addEvent({
+        delay: cfg.baseDelay,
+        callback: () => this.spawnRandomFood()
+      });
     }
-  }
 
-  // 更新生成间隔和 gross 比例
-  cfg.baseDelay = Math.max(cfg.minDelay, cfg.baseDelay * cfg.delayDecay);
-  cfg.grossRatio = Math.min(cfg.maxGrossRatio, cfg.grossRatio + cfg.grossRatioIncrease);
-
-  // 下一轮生成
-  this.time.addEvent({
-    delay: cfg.baseDelay,
-    callback: () => this.spawnRandomFood()
-  });
-}
 
 
   spawnGrossItem(x, y, texture) {
     const item = this.physics.add.sprite(x, y, texture);
-    item.setScale(0.3); 
+    this.resize(0.3, x, y, item); 
     item.isBeingEaten = false;
     this.grossGroup.add(item);
 
@@ -248,7 +266,7 @@ export default class GameScene extends Phaser.Scene {
 
   spawnDeliciousItem(x, y, texture) {
     const item = this.physics.add.sprite(x, y, texture);
-    item.setScale(0.3);
+    this.resize(0.3, x, y, item); 
     item.isBeingEaten = false;
     this.deliciousGroup.add(item);
 
