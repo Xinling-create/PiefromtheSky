@@ -1,5 +1,5 @@
 // mouthEat.js
-import { faceData } from "../main.js";
+import { faceData } from "./main.js";
 
 /**
  * 小猫吃食物的统一处理函数

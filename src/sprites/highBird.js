@@ -44,10 +44,15 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
 
     poop.isBeingEaten = false;
 
-    if (!scene.grossGroup) {
-      scene.specialGrossGroup = scene.add.group();
-    }
-    scene.specialGrossGroup.add(poop);
+    // if (!scene.specialGrossGroup) {
+    //   scene.specialGrossGroup = scene.add.group();
+    // }
+    // scene.specialGrossGroup.add(poop);
+    if (!scene.deadlyPoopGroup) {
+       scene.deadlyPoopGroup = scene.add.group();
+     }
+     scene.deadlyPoopGroup.add(poop);
+    
 
     // 延迟设置物理速度
     scene.time.addEvent({
@@ -58,6 +63,8 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
         if (body && 'setVelocityY' in body) {
           body.setVelocityY(200); // 向下掉
           body.allowGravity = false;
+          body.setSize(poop.width*0.28, poop.height*0.3); // 设置碰撞体大小
+          body.setOffset(poop.width*0.25, poop.height*0.28);
         }
       }
     });

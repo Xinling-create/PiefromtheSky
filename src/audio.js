@@ -21,7 +21,7 @@ export async function initAudio(onLoud) {
 
 
   const cooldownTime = 500; // ms
-  const threshold = 40;
+  const threshold = 50;
 
   function loop() {
     analyser.getByteFrequencyData(data);

@@ -61,6 +61,18 @@ export default class ScoreManager {
     });
   }
 
-  onWin(callback) { this.onWinCallback = callback; }
-  onLose(callback) { this.onLoseCallback = callback; }
+  onWin(callback) {
+    this._onWin = callback;
+  }
+
+  onLose(callback) { 
+    this._onLose = callback; 
+  }
+
+  triggerWin() {
+    this._onWin?.();
+  }
+  triggerLose() {
+    this._onLose?.();
+  }
 }

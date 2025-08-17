@@ -80,7 +80,8 @@ const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
-  physics: { default: 'arcade' },
+  physics: { default: 'arcade',
+   },
   scene: [GameScene],
   scale: {
     mode: Phaser.Scale.RESIZE,  // Phaser 会自动调整画布大小

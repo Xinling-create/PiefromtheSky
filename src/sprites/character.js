@@ -4,6 +4,11 @@ import { isFireCooldown } from "../audio.js";
 export default class Character extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "char_close"); 
+    // ✅ 给角色加物理体（Arcade Physics）
+    scene.physics.add.existing(this);
+
+    // ✅ 限制在世界范围内
+    this.body.setCollideWorldBounds(true);
 
   }
 

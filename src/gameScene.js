@@ -1,7 +1,8 @@
 import Character from "./sprites/character.js";
 import LowBird from "./sprites/lowBird.js";
 import highBird from "./sprites/highBird.js";
-import { checkMouthEat } from "./sprites/mouthEaten.js";
+import { checkMouthEat } from "./mouthEaten.js";
+import { checkDeadlyPoopHit } from "./deadlyPoopHit.js";
 import ScoreManager from './ScoreManager.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -62,7 +63,11 @@ export default class GameScene extends Phaser.Scene {
     // 初始化缩放和位置
     this.resizeCharacter();
     this.add.existing(this.character);
-
+    this.physics.add.existing(this.character);  // ✅ 添加 physics body
+    this.character.body.setCollideWorldBounds(true);
+    // 设置 body 大小和偏移为 sprite 自身尺寸
+    this.character.body.setSize(this.character.width*0.28, this.character.height*0.4);
+    this.character.body.setOffset(this.character.width*0.43, this.character.height*0.38);
 
     this.scale.on('resize', (gameSize) => {
       this.bg.displayWidth = gameSize.width;
@@ -72,6 +77,8 @@ export default class GameScene extends Phaser.Scene {
     this.grossGroup = this.add.group();
     this.specialGrossGroup = this.add.group();
     this.deliciousGroup = this.add.group();
+    //被砸中就会死
+    this.deadlyPoopGroup = this.add.group();
 
     // -------------------
     // 随机生成食物配置
@@ -83,7 +90,7 @@ export default class GameScene extends Phaser.Scene {
       grossRatio: 0.2,      // 初始不可吃比例
       grossRatioIncrease: 0.01,
       maxGrossRatio: 0.4,
-      maxSpawnPerRound: 2
+      maxSpawnPerRound: 1
     };
 
     // -------------------
@@ -339,6 +346,8 @@ export default class GameScene extends Phaser.Scene {
       }
     });
     checkMouthEat(this, this.character, this.grossGroup, this.deliciousGroup, this.specialGrossGroup, 100);
+    // 检查 deadly poop 砸中
+    checkDeadlyPoopHit(this, this.character, this.deadlyPoopGroup);
 
   }
 }
