@@ -29,8 +29,6 @@ export let faceData = {
   noseX: 0
 };
 
-export let fireCooldown = false;
-
 // 人脸检测异步循环
 async function faceLoop() {
   try {
@@ -51,11 +49,9 @@ async function faceLoop() {
 faceLoop();
 
 // 音量检测
-initAudio((volume) => {
-  const percent = Math.min(volume * 200, 100);
-  if (volume > 45) {
-    console.log("🔥 喊声触发喷火！");
-  } 
+initAudio(() => {
+  // 发出一个“玩家喷火”的全局事件，让游戏场景来处理逻辑
+  window.dispatchEvent(new CustomEvent("player:shout"));
 });
 
 // --------------------
@@ -69,12 +65,11 @@ class DebugScene extends Phaser.Scene {
   preload() {}
 
   create() {
-    debugText.innerText = "等待检测中...";
+    
   }
 
   update() {
-    // 显示嘴巴开合状态
-    debugText.innerText = `嘴巴开: ${faceData.mouthOpen} (${faceData.mouthValue.toFixed(2)}) | 鼻X: ${faceData.noseX.toFixed(3)}`;
+    
   }
 }
 
