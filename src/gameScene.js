@@ -57,12 +57,6 @@ export default class GameScene extends Phaser.Scene {
 
     // 初始化缩放和位置
     this.resizeCharacter();
-
-    // 监听窗口变化
-    window.addEventListener('resize', () => {
-      this.resizeCharacter();
-    });
-
     this.add.existing(this.character);
     this.grossGroup = this.add.group();
     this.deliciousGroup = this.add.group();
@@ -134,22 +128,31 @@ export default class GameScene extends Phaser.Scene {
       },
       loop: true
     });
+
+        // 监听窗口变化
+    window.addEventListener('resize', () => {
+      this.resizeCharacter();
+      this.scoreManager.updateScoreTextPosition();
+    });
   }
 
-  resizeCharacter() {
+  resize(sizeRate, xRate, yRate, item) {
     let canvasWidth = this.sys.canvas.width;
     let canvasHeight = this.sys.canvas.height;
 
-    // 让小猫高度占屏幕的 1/5
-    let targetHeight = canvasHeight * 0.55;
+    let targetHeight = canvasHeight * sizeRate;
     let scale = targetHeight / this.character.height;
-
-    this.character.setScale(scale);
-
-    // === 坐标逻辑 ===
-    this.character.x = canvasWidth / 2;   // 居中
-    this.character.y = canvasHeight*0.7;      // 底部贴合
+    if (scale > 1) scale = 1; // 最大缩放比例为 1
+    item.setScale(scale);
+    item.x = canvasWidth * xRate;   
+    item.y = canvasHeight * yRate;      // 底部贴合
   }
+
+  resizeCharacter() {
+    this.resize(0.6, 0.5, 0.7, this.character);
+  }
+    
+  
 
   // 喷火时调用：只烤“靠近小猫”的低空鸟
   triggerFire() {
