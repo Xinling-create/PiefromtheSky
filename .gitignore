@@ -24,11 +24,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# ==============================
-# Phaser / Game assets to ignore
-# ==============================
-# 忽略整个 assets 文件夹
-assets/
 
 # ==============================
 # Optional: IDE / editor
