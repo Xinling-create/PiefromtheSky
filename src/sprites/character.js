@@ -4,9 +4,7 @@ import { isFireCooldown } from "../audio.js";
 export default class Character extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "char_close"); 
-    const frame = this.scene.textures.get(this.texture.key).getSourceImage();
-    const canvasHeight = this.scene.sys.scale.height; 
-    this.setScale(canvasHeight * 0.5 / frame.height);
+
   }
 
   update() {

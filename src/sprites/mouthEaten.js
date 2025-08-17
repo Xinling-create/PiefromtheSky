@@ -43,16 +43,16 @@ export function checkMouthEat(scene, cat, grossGroup, deliciousGroup, range = 10
       duration: 500,
       ease: "Quad.easeIn",
       onComplete: () => {
-        item.destroy();
 
         // 根据 group 判断加分或扣分
         if (grossGroup.contains(item)) {
-          // TODO: 扣分逻辑
-          // scene.addScore(-1);
+          scene.scoreManager.addScore(-5, cat)
+          
         } else if (deliciousGroup.contains(item)) {
-          // TODO: 加分逻辑
-          // scene.addScore(1);
+          scene.scoreManager.addScore(+3, cat)
         }
+
+        item.destroy();
       }
     });
   });

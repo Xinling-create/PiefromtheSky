@@ -27,7 +27,7 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
     this.poopTimer = scene.time.addEvent({
       delay: 1000,
       callback: () => {
-        if (Phaser.Math.Between(0, 100) < 20) { // 20% 概率掉屎
+        if (Phaser.Math.Between(0, 100) < 30) { // 30% 概率掉屎
           this.dropPoop();
         }
       },
