@@ -6,6 +6,7 @@ export default class LowBird extends Phaser.Physics.Arcade.Sprite {
 
   constructor(scene, x, y) {
     super(scene, x, y, "lowbird");
+    this.setScale(0.15);
 
     scene.add.existing(this);
     scene.physics.add.existing(this, false); // false 保证动态体
@@ -32,6 +33,7 @@ export default class LowBird extends Phaser.Physics.Arcade.Sprite {
     this.isRoasted = true;
 
     this.setTexture("roastbird");
+    this.setScale(0.5);
 
     /** @type {Phaser.Physics.Arcade.Body} */
     const body = this.body;

@@ -3,6 +3,7 @@ import Phaser from "phaser";
 export default class HighBird extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, x, y) {
     super(scene, x, y, "highbird");
+    this.setScale(0.1); // 
 
     scene.add.existing(this);
     scene.physics.add.existing(this, false); // false 保证动态体
