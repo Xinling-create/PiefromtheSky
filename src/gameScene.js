@@ -38,11 +38,15 @@ export default class GameScene extends Phaser.Scene {
     this.scoreManager.onWin(() => {
       console.log("You Win!");
       // 停止游戏、显示胜利界面
+      this.scene.pause(); 
+      this.showEndText('You Win!');
     });
 
     this.scoreManager.onLose(() => {
       console.log("You Lose!");
       // 停止游戏、显示失败界面
+      this.scene.pause(); 
+      this.showEndText('You Lose!');
     });
 
     // 背景
@@ -58,27 +62,28 @@ export default class GameScene extends Phaser.Scene {
     // 初始化缩放和位置
     this.resizeCharacter();
     this.add.existing(this.character);
-    this.grossGroup = this.add.group();
-    this.deliciousGroup = this.add.group();
+
 
     this.scale.on('resize', (gameSize) => {
       this.bg.displayWidth = gameSize.width;
       this.bg.displayHeight = gameSize.height;
     });
 
-    
+    this.grossGroup = this.add.group();
+    this.specialGrossGroup = this.add.group();
+    this.deliciousGroup = this.add.group();
 
     // -------------------
     // 随机生成食物配置
     // -------------------
     this.spawnConfig = {
-      baseDelay: 2000,      // 初始间隔
-      minDelay: 500,        // 最小间隔
-      delayDecay: 0.95,     // 每轮递减
+      baseDelay: 10000,      // 初始间隔
+      minDelay: 5000,        // 最小间隔
+      delayDecay: 0.05,     // 每轮递减
       grossRatio: 0.2,      // 初始不可吃比例
       grossRatioIncrease: 0.01,
       maxGrossRatio: 0.4,
-      maxSpawnPerRound: 3
+      maxSpawnPerRound: 2
     };
 
     // -------------------
@@ -90,7 +95,7 @@ export default class GameScene extends Phaser.Scene {
     //lowbird group
     this.lowBirds = this.physics.add.group();
     // 随机下次生成时间（5000~8000 ms）
-    const nextDelay2 = Phaser.Math.Between(5000, 8000);
+    const nextDelay2 = Phaser.Math.Between(8000, 15000);
     this.time.addEvent({
       // 每隔一段时间生成一只低空飞过的鸟，具体时间待设置
       delay: nextDelay2,
@@ -122,7 +127,7 @@ export default class GameScene extends Phaser.Scene {
     //highbird group
     this.highBirds = this.physics.add.group();
      // 随机下次生成时间（3000~5000 ms）
-    const nextDelay1 = Phaser.Math.Between(3000, 5000);
+    const nextDelay1 = Phaser.Math.Between(6000, 10000);
     // 每隔 3 秒生成一只高空鸟
     this.time.addEvent({
       delay: nextDelay1,
@@ -193,7 +198,7 @@ export default class GameScene extends Phaser.Scene {
       const canvasWidth = this.sys.canvas.width;
       const canvasHeight = this.sys.canvas.height;
 
-      const existingItems = [...this.deliciousGroup.getChildren(), ...this.grossGroup.getChildren()];
+      const existingItems = [...this.deliciousGroup.getChildren(), ...this.grossGroup.getChildren(), ...this.specialGrossGroup.getChildren()];
       const existingXRates = existingItems.map(item => item.x / canvasWidth);
 
       const minSpacingRate = 0.05; // 最小水平间隔比例
@@ -294,7 +299,7 @@ export default class GameScene extends Phaser.Scene {
 
         // 通过 scene 访问 scoreManager，并传入小猫实例显示浮动文字
         if (this.scene.scoreManager && this.scene.character) {
-          this.scene.scoreManager.addScore(-1, this.scene.character);
+          this.scene.scoreManager.addScore(-1, this);
         }
 
         this.destroy();
@@ -305,6 +310,26 @@ export default class GameScene extends Phaser.Scene {
     return item;
   }
 
+  // 辅助方法
+  showEndText(textString) {
+    const text = this.add.text(
+      this.cameras.main.width / 2, 
+      this.cameras.main.height / 2, 
+      textString, 
+      { 
+        fontSize: '64px', 
+        color: '#ffffff', 
+        fontStyle: 'bold',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        padding: { x: 20, y: 10 },
+        align: 'center'
+      }
+    );
+    text.setOrigin(0.5);
+    text.setScrollFactor(0);
+    text.setDepth(100);
+  }
+
   
   update() {
     this.character.update();
@@ -313,7 +338,7 @@ export default class GameScene extends Phaser.Scene {
         bird.preUpdate(this.time.now, this.time.delta);
       }
     });
-    checkMouthEat(this, this.character, this.grossGroup, this.deliciousGroup, 100);
+    checkMouthEat(this, this.character, this.grossGroup, this.deliciousGroup, this.specialGrossGroup, 100);
 
   }
 }

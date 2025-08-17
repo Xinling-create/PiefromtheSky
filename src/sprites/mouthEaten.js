@@ -6,14 +6,15 @@ import { faceData } from "../main.js";
  * @param {Phaser.Scene} scene - 当前场景
  * @param {Phaser.GameObjects.Sprite} cat - 小猫精灵
  * @param {Phaser.GameObjects.Group} grossGroup - 恶心食物组
+ * @param {Phaser.GameObjects.Group} specialGrossGroup - 极恶心食物组
  * @param {Phaser.GameObjects.Group} deliciousGroup - 美味食物组
  * @param {number} range - 吃东西的触发范围（像素）
  */
-export function checkMouthEat(scene, cat, grossGroup, deliciousGroup, range = 100) {
+export function checkMouthEat(scene, cat, grossGroup, deliciousGroup, specialGrossGroup, range = 100) {
   // 只在嘴巴张开的情况下触发
   if (!faceData.mouthOpen) return;
 
-  const allItems = [...grossGroup.getChildren(), ...deliciousGroup.getChildren()];
+  const allItems = [...grossGroup.getChildren(), ...deliciousGroup.getChildren(), ...specialGrossGroup.getChildren()];
 
   allItems.forEach((item) => {
     // 已经在 Tween 中的物体不重复触发
@@ -46,11 +47,13 @@ export function checkMouthEat(scene, cat, grossGroup, deliciousGroup, range = 10
 
         // 根据 group 判断加分或扣分
         if (grossGroup.contains(item)) {
-          scene.scoreManager.addScore(-5, cat)
+          scene.scoreManager.addScore(-1, cat)
           
+        } else if (specialGrossGroup.contains(item)) {
+          scene.scoreManager.addScore(-5, cat)
         } else if (deliciousGroup.contains(item)) {
           scene.scoreManager.addScore(+3, cat)
-        }
+        } 
 
         item.destroy();
       }

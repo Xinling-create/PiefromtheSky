@@ -23,7 +23,7 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
     this.poopTimer = scene.time.addEvent({
       delay: 1000,
       callback: () => {
-        if (Phaser.Math.Between(0, 100) < 30) { // 30% 概率掉屎
+        if (Phaser.Math.Between(0, 100) < 20) { // % 概率掉屎
           this.dropPoop();
         }
       },
@@ -45,9 +45,9 @@ export default class HighBird extends Phaser.Physics.Arcade.Sprite {
     poop.isBeingEaten = false;
 
     if (!scene.grossGroup) {
-      scene.grossGroup = scene.add.group();
+      scene.specialGrossGroup = scene.add.group();
     }
-    scene.grossGroup.add(poop);
+    scene.specialGrossGroup.add(poop);
 
     // 延迟设置物理速度
     scene.time.addEvent({

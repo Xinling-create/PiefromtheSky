@@ -41,7 +41,7 @@ export default class ScoreManager {
 
   showFloatingText(cat, value) {
     const sign = value > 0 ? '+' : '';
-    const color = value > 0 ? '#0f0' : '#f00';
+    const color = value > 0 ? 'rgba(53, 82, 53, 1)' : 'rgba(77, 28, 28, 1)';
 
     const text = this.scene.add.text(cat.x, cat.y - 50, `${sign}${value}`, {
       fontSize: '28px',
