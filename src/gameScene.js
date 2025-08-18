@@ -169,8 +169,7 @@ export default class GameScene extends Phaser.Scene {
     this.eatSound = this.sound.add('eat');      // 吃到食物音效
     this.shitSound = this.sound.add('shit');    // 被shit砸到音效
     this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 }); // 游戏BGM
-
-    //this.bgm.play(); // 进入游戏自动播放BGM
+    this.bgm.play(); // 进入游戏自动播放BGM
   }
 
   resize(sizeRate, xRate, yRate, item) {

@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import GameScene from "./gameScene.js";
+import CoverScene from "./coverScene.js";
 import { initCamera } from "./camera.js";
 import { initFaceLandmarker, detectFace } from "./face.js";
 import { initAudio } from "./audio.js";
@@ -80,11 +81,13 @@ const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
   height: window.innerHeight,
-  physics: { default: 'arcade',
-   },
-  scene: [GameScene],
+  parent: 'gameContainer',  // <--- 指定容器
+  physics: {
+    default: 'arcade',
+  },
+  scene: [CoverScene, GameScene],
   scale: {
-    mode: Phaser.Scale.RESIZE,  // Phaser 会自动调整画布大小
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   }
 };
