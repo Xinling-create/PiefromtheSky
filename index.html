@@ -54,7 +54,7 @@
   <!-- 封面 -->
   <div id="cover">
     <img id="coverImg" src="assets/cover.png" alt="Cover" />
-    <img id="startBtn" src="assets/Start.png" alt="Start Game" />
+    <img id="startBtn" src="assets/start.png" alt="Start Game" />
   </div>
 
   <!-- 游戏容器 -->
@@ -62,17 +62,38 @@
     <script type="module" src="../src/main.js"></script>
   </div>
 
+  <audio id="bgm2" src="assets/bgm2.m4a" loop></audio>
+  <audio id="bgm" src="assets/bgm.m4a" loop></audio>
+
   <script>
     const cover = document.getElementById('cover');
     const startBtn = document.getElementById('startBtn');
     const gameContainer = document.getElementById('gameContainer');
+    const bgm2 = document.getElementById('bgm2');
+    const bgm = document.getElementById('bgm');
+
+    // 进入页面时自动播放 bgm2（部分浏览器需用户交互）
+    window.addEventListener('DOMContentLoaded', () => {
+      bgm2.volume = 0.5;
+      bgm.volume = 0.5;
+      bgm2.play().catch(() => {});
+      // 兼容：首次点击页面时强制播放
+      document.body.addEventListener('click', function once() {
+        bgm2.play().catch(()=>{});
+        document.body.removeEventListener('click', once);
+      });
+    });
 
     startBtn.addEventListener('click', () => {
+      // 切换音乐
+      bgm2.pause();
+      bgm2.currentTime = 0;
+      bgm.play().catch(()=>{});
       cover.style.opacity = 0;
       setTimeout(() => {
         cover.style.display = 'none';
         gameContainer.style.display = 'block';
-      }, 800);
+      }, 8000);
     });
   </script>
 

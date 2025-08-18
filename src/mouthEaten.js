@@ -47,12 +47,14 @@ export function checkMouthEat(scene, cat, grossGroup, deliciousGroup, specialGro
 
         // 根据 group 判断加分或扣分
         if (grossGroup.contains(item)) {
-          scene.scoreManager.addScore(-1, cat)
+          scene.scoreManager.addScore(-10, cat)
+          scene.shitSound.play();
           
         } else if (specialGrossGroup.contains(item)) {
           scene.scoreManager.addScore(-5, cat)
         } else if (deliciousGroup.contains(item)) {
           scene.scoreManager.addScore(+3, cat)
+          scene.eatSound.play();
         } 
 
         item.destroy();

@@ -8,6 +8,7 @@ import ScoreManager from './ScoreManager.js';
 export default class GameScene extends Phaser.Scene {
   constructor() {
     super("GameScene");
+    this.isGameOver = false; // 新增，标记游戏是否结束
   }
 
   preload() {
@@ -31,6 +32,10 @@ export default class GameScene extends Phaser.Scene {
     this.load.image("d9", "assets/Taco.png");
     this.load.image("d10", "assets/Teriyaki.png");
     this.load.image("g1", "assets/capsule.png");
+    this.load.image("again", "assets/again.png");
+    this.load.audio('eat', 'assets/eat.m4a');
+    this.load.audio('shit', 'assets/shit.m4a');
+    this.load.audio('bgm', 'assets/bgm.m4a');
   }
 
   create() {
@@ -39,15 +44,18 @@ export default class GameScene extends Phaser.Scene {
     this.scoreManager.onWin(() => {
       console.log("You Win!");
       // 停止游戏、显示胜利界面
-      this.scene.pause(); 
+      //this.scene.pause(); 
+      this.isGameOver = true;
       this.showEndText('You Win!');
     });
 
     this.scoreManager.onLose(() => {
       console.log("You Lose!");
       // 停止游戏、显示失败界面
-      this.scene.pause(); 
+      //this.scene.pause(); 替换成以下判断
+      this.isGameOver = true;
       this.showEndText('You Lose!');
+      this.shitSound.play();
     });
 
     // 背景
@@ -156,6 +164,13 @@ export default class GameScene extends Phaser.Scene {
       this.resizeCharacter();
       this.scoreManager.updateScoreTextPosition();
     });
+
+    // 音效对象
+    this.eatSound = this.sound.add('eat');      // 吃到食物音效
+    this.shitSound = this.sound.add('shit');    // 被shit砸到音效
+    this.bgm = this.sound.add('bgm', { loop: true, volume: 0.5 }); // 游戏BGM
+
+    //this.bgm.play(); // 进入游戏自动播放BGM
   }
 
   resize(sizeRate, xRate, yRate, item) {
@@ -191,7 +206,7 @@ export default class GameScene extends Phaser.Scene {
       if (dx <= rangeX && dy <= rangeY) {
         bird.roast(() => {
           this.scoreManager.addScore(+5, this.character)// 成功吃到烤鸟的回调（可选）：加分/粒子特效/音效等
-          // 这里可以添加一些特效或音效
+          this.eatSound.play();// 这里可以添加一些特效或音效
         });
       }
     });
@@ -267,7 +282,7 @@ export default class GameScene extends Phaser.Scene {
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = item.body;
         if (body && 'setVelocityY' in body) {
-          body.setVelocityY(200);
+          body.setVelocityY(300);
           body.allowGravity = false;
         }
       }
@@ -289,7 +304,7 @@ export default class GameScene extends Phaser.Scene {
         /** @type {Phaser.Physics.Arcade.Body} */
         const body = item.body;
         if (body && 'setVelocityY' in body) {
-          body.setVelocityY(200);
+          body.setVelocityY(300);
           body.allowGravity = false;
         }
       }
@@ -306,7 +321,8 @@ export default class GameScene extends Phaser.Scene {
 
         // 通过 scene 访问 scoreManager，并传入小猫实例显示浮动文字
         if (this.scene.scoreManager && this.scene.character) {
-          this.scene.scoreManager.addScore(-1, this);
+          this.scene.scoreManager.addScore(-5, this);
+          this.scene.shitSound.play();
         }
 
         this.destroy();
@@ -319,6 +335,10 @@ export default class GameScene extends Phaser.Scene {
 
   // 辅助方法
   showEndText(textString) {
+    // 停止当前 BGM，防止叠加
+  if (this.bgm && this.bgm.isPlaying) {
+    this.bgm.stop();
+  }
     const text = this.add.text(
       this.cameras.main.width / 2, 
       this.cameras.main.height / 2, 
@@ -335,10 +355,26 @@ export default class GameScene extends Phaser.Scene {
     text.setOrigin(0.5);
     text.setScrollFactor(0);
     text.setDepth(100);
+
+    // 添加 Again 按钮
+  const againBtn = this.add.image(
+    this.cameras.main.width / 2,
+    this.cameras.main.height / 2 + 100,
+    'again'
+  ).setInteractive();
+  againBtn.setOrigin(0.5);
+  againBtn.setDepth(101);
+  againBtn.setScale(0.5); 
+
+  againBtn.on('pointerdown', () => {
+    window.location.href = "/index.html";// 或者 "/"，取决于你的部署
+  });
   }
 
   
   update() {
+    if (this.isGameOver) return; // 游戏结束后不再执行游戏逻辑
+    
     this.character.update();
     this.lowBirds.children.iterate(bird => {
       if (bird && !bird.destroyed) {

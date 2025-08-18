@@ -35,8 +35,8 @@ export default class ScoreManager {
     // 显示浮动文字
     if (cat) this.showFloatingText(cat, value);
 
-    if (this.score >= this.targetScore) this.onWinCallback?.();
-    if (this.score <= 0) this.onLoseCallback?.();
+    if (this.score >= this.targetScore) this.triggerWin?.();
+    if (this.score <= 0) this.triggerLose?.();
   }
 
   showFloatingText(cat, value) {
